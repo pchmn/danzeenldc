@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load bleach_tags %}
+{% load l10n %}
+
+{% block css %}
+    <link rel="stylesheet/less" type="text/css" href="{% static 'articles/css/style-articles.less' %}">
+{% endblock %}
+
+{% block js_url %}
+    <script src="{% static 'js/dotdot.js' %}" type="text/javascript"></script>
+{% endblock %}
+
+{% block content %}
+{# ------- #}
+{# article #}
+{# ------- #}
+<div class="mdl-grid" id="article_detail" >
+    <div class="mdl-cell mdl-cell--10-col">
+        <div class="mdl-grid">
+            <div class="mdl-cell mdl-cell--9-col">
+                <p id="article_date">{{ article.date | date:"j F Y" }}</p>
+                <h1>{{ article.title }}</h1>
+                <p id="article_author"><i>Écrit par</i> <a href=""><b>{{ article.author.username }}</b></a></p>
+            </div>
+
+            <div class="mdl-cell mdl-cell--3-col mdl-cell--12-col-tablet mdl-cell--12-col-phone" id="article_likes_parent">
+                <div id="article_likes">
+                    <p id="nb_vues">
+                        vues<br>
+                        <span>{{ article.views }}</span>
+                    </p>
+                    <div id="div_bar_votes">
+                        {% if article.likes_width == 0 and article.dislikes_width == 0 %}
+                            <div class="bar_votes" style="width: 100%; background: #727272"></div>
+                        {% else %}
+                            <div class="bar_votes" id="bar_likes" style="width: {{ article.likes_width }}%;"></div>
+                            <div class="bar_votes" id="bar_dislikes" style="width: {{ article.dislikes_width }}%;"></div>
+                        {% endif %}
+                    </div>
+                    <div id="div_nb_vote">
+
+                        <span class="nb_vote" id="icon_article_likes"><i class="material-icons">thumb_up</i> {{ article.likes }}</span>
+                        <span class="nb_vote" id="icon_article_dislikes"><i class="material-icons">thumb_down</i> {{ article.dislikes }}</span>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="article_intro">{{ article.intro }}</div>
+
+        <div id="article_content">{{ article.content|bleach }}</div>
+
+    </div>
+</div>
+
+{# ------------------------ #}
+{# bandeau votes et partage #}
+{# ------------------------ #}
+<div id="div_buttons_vote">
+    <div class="mdl-grid" id="div_buttons_vote_content">
+        <div class="mdl-cell--10-col">
+            {% if already_voted %}
+
+                {% if opinion == "like_article" %}
+                        <a href="javascript:void(0);" id="like_article" class="vote_article already_voted">
+                            <p>
+                                <i class="material-icons">thumb_up</i>
+                                <span>Cool</span>
+                            </p>
+                        </a>
+                        <a href="javascript:void(0);" id="dislike_article" class="vote_article no_voted_yet">
+                            <p>
+                                <i class="material-icons">thumb_down</i>
+                                <span>Nul</span>
+                            </p>
+                        </a>
+
+                {% elif opinion == "dislike_article" %}
+                        <a href="javascript:void(0);" id="like_article" class="vote_article no_voted_yet">
+                            <p>
+                                <i class="material-icons">thumb_up</i>
+                                <span>Cool</span>
+                            </p>
+                        </a>
+                        <a href="javascript:void(0);" id="dislike_article" class="vote_article already_voted">
+                            <p>
+                                <i class="material-icons">thumb_down</i>
+                                <span>Nul</span>
+                            </p>
+                        </a>
+                {% endif %}
+
+                {% else %}
+                        <a href="javascript:void(0);" id="like_article" class="vote_article">
+                            <p>
+                                <i class="material-icons">thumb_up</i>
+                                <span>Cool</span>
+                            </p>
+                        </a>
+                        <a href="javascript:void(0);" id="dislike_article" class="vote_article">
+                            <p>
+                                <i class="material-icons">thumb_down</i>
+                                <span>Nul</span>
+                            </p>
+                        </a>
+                {% endif %}
+
+                        <a href="javascript:void(0);" id="share_article" class="vote_article">
+                            <p>
+                                <i class="material-icons">share</i>
+                                <span>Partager</span>
+                            </p>
+                        </a>
+
+        </div>
+    </div>
+</div>
+
+    {# bouton modification article #}
+    {% if request.user.is_authenticated and request.user == article.author %}
+
+        {% block fab_create_article %}
+        {% endblock %}
+
+            <a href="{% url "update_article" article.slug %}" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect button_fab_action" id="button_edit_article">
+                <i class="material-icons">mode_edit</i>
+            </a>
+
+            <div class="mdl-tooltip mdl-tooltip--large mdl-tooltip--left" for="button_edit_article">
+                Modifier cet article
+            </div>
+    {% endif %}
+
+{# --------------------------------- #}
+{# commentaires et derniers articles #}
+{# --------------------------------- #}
+<div class="mdl-grid" id="article_comments_suggest" >
+    <div class="mdl-cell mdl-cell--1-col"></div>
+    <div class="mdl-cell mdl-cell--6-col" id="article_comments">
+        <h4>Commentaires</h4>
+        <div id="article_comments_head">
+            {% include "articles/create_comment.html" %}
+        </div>
+
+        <div id="article_comments_body">
+            <div id="article_comments_body_content">
+            {% if comments %}
+                {% for comment in comments %}
+                    <div id="parent_comment_{{ comment.id }}">
+                        <div id="comment_{{ comment.id }}">
+                            <p class="comment_author">{{ comment.author }} <span class="comment_date"><em>{{ comment.date | date:"d b, H:i" }}</em></span></p>
+                            <p class="comment_content">{{ comment.content }}</p>
+                            {% if comment.score > 0 %}
+                                <span class="comment_score">{{ comment.score }}</span>
+                            {% endif %}
+                            <a href="javascript:void(0);" id="like_comment" class="vote_comment" data-id-comment="{{ comment.id }}"><i class="material-icons">keyboard_arrow_up</i></a>
+                            <a href="javascript:void(0);" id="dislike_comment" class="vote_comment" data-id-comment="{{ comment.id }}"><i class="material-icons">keyboard_arrow_down</i></a>
+                        </div>
+                    </div>
+                {% endfor %}
+
+                <div id="article_comments_pagination">
+                   {% if comments.has_previous %}
+                       <a href="javascript:void(0);" class="comments_page mdl-button mdl-js-button mdl-button--icon" id="{{ comments.previous_page_number }}">
+                           <i class="material-icons">arrow_backward</i>
+                       </a>
+                   {% else %}
+                       <a href="javascript:void(0);" class="mdl-button mdl-js-button mdl-button--icon disabled">
+                           <i class="material-icons">arrow_backward</i>
+                       </a>
+                   {% endif %}
+
+                   <span class="current">
+                       <b>{{ comments.number }}</b> / {{ comments.paginator.num_pages }}
+                   </span>
+
+                   {% if comments.has_next %}
+                       <a href="javascript:void(0);" class="comments_page mdl-button mdl-js-button mdl-button--icon"  id="{{ comments.next_page_number }}"><i class="material-icons">arrow_forward</i></a>
+                   {% else %}
+                       <a href="javascript:void(0);" class="mdl-button mdl-js-button mdl-button--icon disabled">
+                           <i class="material-icons">arrow_forward</i>
+                       </a>
+                   {% endif %}
+                </div>
+            {% else %}
+                <p style="margin-bottom: 0;">Postez le premier commentaire !</p>
+            {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="mdl-cell mdl-cell--4-col mdl-cell--6-col-tablet" id="last_articles">
+        <h4>Derniers articles</h4>
+        {% for last_article in  last_articles %}
+            <a href="{% url "get_article" last_article.slug %}">
+                <div class="last_article_card">
+                    <p class="last_article_title">{{ last_article.title }}</p>
+                    <p class="last_article_date">{{ last_article.date | date:"d b"}}</p>
+                    <p class="last_article_views">{{ last_article.views }} <em>vues</em></p>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+    <div class="mdl-cell mdl-cell--1-col"></div>
+</div>
+
+{% endblock %}
+
+{% comment %}{% block snackbar %}
+    {% if form_success %}
+    <div class="snackbar" id="form_state">
+        <span class="snackbar_text"><i class="material-icons">done</i> {{ snackbar_message }}</span>
+        <span class="snackbar_close">Fermer</span>
+    </div>
+    {% endif %}
+
+    {% if form.errors %}
+    <div class="snackbar" id="form_state">
+        <span class="snackbar_text"><i class="material-icons">report_problem</i> {{ snackbar_message }}</span>
+        <span class="snackbar_close">Fermer</span>
+    </div>
+    {% endif %}
+{% endblock %}{% endcomment %}
+
+{# --------- #}
+{# Script JS #}
+{# --------- #}
+{% block script %}
+<script>
+    // ajax - vote_article
+    $("#div_buttons_vote").on('click', "a.vote_article", function() {
+        $.ajax({
+            url: 'http://127.0.0.1:8000/articles/vote_article/{{ article.id }}/' + $(this).attr("id"),
+            type: 'get',
+            dataType: "json",
+            success: function(data) {
+                $("#div_buttons_vote").load("{% url "get_article" article.slug %} #div_buttons_vote_content");
+                $("#article_likes_parent").load("{% url "get_article" article.slug %} #article_likes");
+            },
+            failure: function(data) {
+                alert('Erreur');
+            }
+        })
+    });
+
+    // ajax - vote_comment
+    $("#article_comments_suggest").on('click', "a.vote_comment", function() {
+        var id_commentaire = $(this).attr("data-id-comment");
+        var like = $(this).attr("id");
+
+        $.ajax({
+            url: 'http://127.0.0.1:8000/articles/vote_comment/' + id_commentaire + '/' + like,
+            type: 'get',
+            dataType: "json",
+            success: function(data) {
+                var page = $("#article_comments_pagination .current b").text();
+                $("#parent_comment_" + id_commentaire ).load("{% url "get_article" article.slug %}?page_comments=" + page + " #comment_" + id_commentaire)
+            },
+            failure: function(data) {
+                alert('Erreur');
+            }
+        })
+    });
+
+    // ajax - page_comments
+    $("#article_comments_suggest").on('click', "a.comments_page", function() {
+        var page = $(this).attr("id");
+
+        $("#article_comments_body").load("{% url "get_article" article.slug %}?page_comments=" + page + " #article_comments_body_content")
+
+    });
+
+    // margin-left for last_articles on samll devices
+    $(function(){
+        if (window.matchMedia("(max-width: 839px)").matches && window.matchMedia("(min-width: 480px)").matches) {
+            var width = $('.mdl-cell--1-col').width() - 16;
+            console.log(width)
+            $('#last_articles').css('margin-left', width + 'px');
+        }
+    });
+
+    // truncat last_article_title
+    $(document).ready(function() {
+        $(".last_article_title").dotdotdot({
+            wrap: 'letter'
+        });
+    });
+</script>
+{% endblock %}

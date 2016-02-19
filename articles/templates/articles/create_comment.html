@@ -1,0 +1,25 @@
+<form action="" method="post">
+    {% csrf_token %}
+
+    {% if not request.user.is_authenticated %}
+      {% if form.author.errors %}
+          {% for error in form.author.errors %}
+              <p class="form_errors"><i class="material-icons">report_problem</i> {{ error }}</p>
+          {% endfor %}
+      {% endif %}
+      <div class="mdl-textfield mdl-js-textfield">
+        <input class="mdl-textfield__input" type="text" name="author" id="id_author">
+        <label class="mdl-textfield__label" for="id_author">Pseudo</label>
+      </div>
+    {% endif %}
+      {% if form.content.errors %}
+          {% for error in form.content.errors %}
+              <p class="form_errors"><i class="material-icons">report_problem</i> {{ error }}</p>
+          {% endfor %}
+      {% endif %}
+      <div class="mdl-textfield mdl-js-textfield">
+        <textarea class="mdl-textfield__input" type="text" name="content" rows= "3" id="id_content" ></textarea>
+        <label class="mdl-textfield__label" for="id_content">Votre commentaire</label>
+      </div>
+    <input type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect" value="Valider">
+</form>

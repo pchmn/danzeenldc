@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load l10n %}
+
+{% block css %}
+    <link rel="stylesheet/less" type="text/css" href="{% static 'articles/css/style-articles.less' %}">
+{% endblock %}
+
+{% block accueil_active %}active{% endblock %}
+{% block accueil_active_2 %}active{% endblock %}
+
+{% block content %}
+
+<div class="mdl-grid" id="articles_list_container">
+    <div class="mdl-cell mdl-cell--11-col">
+
+{% comment %}        <div id="articles_list">
+            {% for article in articles %}
+                {% if forloop.counter0|divisibleby:2 %}
+                    <div class="mdl-grid row">
+                {% endif %}
+                <div class="mdl-cell mdl-cell--6-col">
+                    <a href="{% url "get_article" article.slug %}" class="link_article">
+                        <div class="article_card">
+                            <div class="div_title">
+                                <h3 class="article_title">{{ article.title }}</h3>
+                                <span class="article_date">{{ article.date | date:"d b" }}</span>
+                            </div>
+                            <div class="div_infos">
+                                <span class="article_views">{{ article.views }} <em>vues</em></span>
+                                <div class="div_bar_votes">
+                                    {% if article.likes_width == 0 and article.dislikes_width == 0 %}
+                                        <div class="bar_votes" style="width: 100%; background: #727272"></div>
+                                    {% else %}
+                                        <div class="bar_votes" id="bar_likes" style="width: {{ article.likes_width }}%;"></div>
+                                        <div class="bar_votes" id="bar_dislikes" style="width: {{ article.dislikes_width }}%;"></div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% if not forloop.counter0|divisibleby:2 %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>{% endcomment %}
+
+        <div class="mdl-grid">
+            {# Liste des articles #}
+            <div class="mdl-cell mdl-cell--8-col">
+                <div id="articles_list1">
+                    {# filtres  #}
+                    <ul id="filters_article">
+                        <li class="filter active" data-order="-date">Récents</li>
+                        <li class="filter" data-order="-score">Mieux notés</li>
+                        <li class="filter" data-order="-views">Populaires</li>
+                    </ul>
+
+                    {# articles #}
+                    {# utile pour l'ajax #}
+                    <div id="div_articles_parent">
+                        <div id="div_articles_content">
+
+                            {% for article in articles %}
+
+                                <div class="article_card">
+                                    <a href="{% url "get_article" article.slug %}" class="article_title">{{ article.title }}</a>
+                                    <span class="article_date">{{ article.date | date:"d b" }}</span>
+
+                                    <p class="article_intro">{{ article.intro | truncatewords:20 }}</p>
+
+                                    <span class="article_views">{{ article.views }} <em>vues</em></span>
+                                    <div class="div_bar_votes">
+                                        {% if article.likes_width == 0 and article.dislikes_width == 0 %}
+                                            <div class="bar_votes" style="width: 100%; background: #727272"></div>
+                                        {% else %}
+                                            <div class="bar_votes" id="bar_likes" style="width: {{ article.likes_width }}%;"></div>
+                                            <div class="bar_votes" id="bar_dislikes" style="width: {{ article.dislikes_width }}%;"></div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+                    </div>
+
+                    {# pagination #}
+                    <div id="articles_list_pagination">
+                        {% if articles.has_previous %}
+                            <a href="javascript:void(0);" class="comments_page mdl-button mdl-js-button mdl-button--icon" id="{{ articles.previous_page_number }}">
+                                <i class="material-icons">arrow_backward</i>
+                            </a>
+
+                        {% else %}
+                            <a href="javascript:void(0);" class="mdl-button mdl-js-button mdl-button--icon disabled">
+                                <i class="material-icons">arrow_backward</i>
+                            </a>
+                        {% endif %}
+
+                        <span class="current">
+                            <b>{{ articles.number }}</b> / {{ articles.paginator.num_pages }}
+                        </span>
+                        {% if articles.has_next %}
+                            <a href="javascript:void(0);" class="comments_page mdl-button mdl-js-button mdl-button--icon"  id="{{ articles.next_page_number }}"><i class="material-icons">arrow_forward</i></a>
+
+                        {% else %}
+                            <a href="javascript:void(0);" class="mdl-button mdl-js-button mdl-button--icon disabled">
+                                <i class="material-icons">arrow_forward</i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {# Fin liste des articles #}
+
+            {# Infos (classement, résultats, ...) #}
+            <div id="relative_infos" class="mdl-cell mdl-cell--4-col mdl-cell--6-col-tablet">
+                <div id="infos_srfc">
+
+                    {# classement #}
+                    <div id="wrap_table" class="small_tab">
+                        <span class="infos_title">Classement Ligue 1</span>
+                        <table id="classement_ligue1">
+                            <thead>
+                            <tr>
+                                <th>N°</th>
+                                <th >Équipe</th>
+                                <th>MJ</th>
+                                <th>PTS</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                                {% for team in ranking.items %}
+                                    {% if team.1.team == "Stade Rennais FC" %}
+                                        <tr class="rennes">
+                                    {% else %}
+                                        <tr>
+                                    {% endif %}
+                                        <td>{{ team.1.position }}</td>
+                                        <td class="equipe">{{ team.1.team }}</td>
+                                        <td>{{ team.1.playedGames }}</td>
+                                        <td class="pts">{{ team.1.points }}</td>
+                                        </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <span id="resize_tab">Tout voir <i class="material-icons">keyboard_arrow_down</i></span>
+
+                    {# dernier match #}
+                    <div class="last_result_next_match">
+                        <span class="infos_title">Dernier match</span><span class="matchday">Journée {{ last_result.matchday }}</span><br>
+                        <div class="team_match">
+                            <img src="{{ last_result.homeTeam.img }}" alt="{{ last_result.homeTeam.name }}" id="last_result_home_team_img">
+                            <div class="mdl-tooltip" for="last_result_home_team_img">
+                                {{ last_result.homeTeam.name }}
+                            </div>
+                            <span class="result_match">
+                                {{ last_result.result.goalsHomeTeam }} - {{ last_result.result.goalsAwayTeam }}
+                            </span>
+                            <img src="{{ last_result.awayTeam.img }}" alt="{{ last_result.awayTeam.name }}" id="last_result_away_team_img">
+                            <div class="mdl-tooltip" for="last_result_away_team_img">
+                                {{ last_result.awayTeam.name }}
+                            </div>
+                        </div>
+                    </div>
+
+                    {# prochain match #}
+                    <div class="last_result_next_match">
+                        <span class="infos_title">Prochain match</span><span class="matchday">Journée {{ next_match.matchday }}</span><br>
+                        <div class="team_match team_next_match">
+                            <img src="{{ next_match.homeTeam.img }}" alt="{{ next_match.homeTeam.name }}" id="next_match_home_team_img">
+                            <div class="mdl-tooltip" for="next_match_home_team_img">
+                                {{ next_match.homeTeam.name }}
+                            </div>
+                            <span id="date_next_match">
+                                {{ next_match.date | date:"d b" }}<br>
+                            </span>
+                            <div class="mdl-tooltip" for="date_next_match">
+                                à {{ next_match.date | date:"H:i" }}
+                            </div>
+                            <img src="{{ next_match.awayTeam.img }}" alt="{{ next_match.awayTeam.name }}" id="next_match_away_team_img">
+                            <div class="mdl-tooltip" for="next_match_away_team_img">
+                                {{ next_match.awayTeam.name }}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            {# fin Infos #}
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+
+    <script>
+        // truncate texte
+        //$('.list_article_content img').parent().hide();
+
+        // correct width for fixed element
+        //$('#infos_srfc').width($('#relative_infos').width());
+
+        // ajax filter articles
+        $('li.filter').click(function() {
+            $("#div_articles_parent").load("{% url "get_articles" %}?order=" + $(this).attr("data-order") + " #div_articles_content");
+            $('li.filter').removeClass('active');
+            $(this).first().addClass('active');
+        });
+
+        // resize tableau classement
+        $(function tabRanking() {
+            var buttonResize = $('#resize_tab');
+            var tab = $('#classement_ligue1');
+            var wrapTable = $('#wrap_table');
+
+            buttonResize.width(tab.width());
+
+            buttonResize.click(function(){
+                console.log("1st", wrapTable.height())
+                if(wrapTable.hasClass("small_tab")) {
+                    wrapTable.removeClass("small_tab");
+                    buttonResize.html('Moins voir <i class="material-icons">keyboard_arrow_up</i>');
+                }
+                else {
+                    wrapTable.addClass("small_tab");
+                    buttonResize.html('Tout voir <i class="material-icons">keyboard_arrow_down</i>');
+                }
+                console.log("2nd", wrapTable.height())
+            });
+        });
+    </script>
+
+{% endblock %}

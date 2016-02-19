@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+{% load bleach_tags %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'editor/dist/ui/trumbowyg.min.css' %}">
+    <link rel="stylesheet/less" type="text/css" href="{% static 'articles/css/style-articles.less' %}">
+    <link rel="stylesheet/less" type="text/css" href="{% static 'css/style-form.less' %}">
+{% endblock %}
+
+{% block js_url %}
+    <script src="{% static 'editor/dist/trumbowyg.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="mdl-grid">
+    <div class="mdl-cell mdl-cell--10-col">
+        <h2 class="page_title">Modifier un article</h2>
+
+        <div class="mdl-grid">
+            <div id="div_form_create_update_article">
+
+                <form action="" method="post">
+                    {% csrf_token %}
+
+                      <div class="input">
+                          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input class="mdl-textfield__input" id="id_title" maxlength="200" name="title" type="text" value="{{ object.title }}">
+                            <label class="mdl-textfield__label" for="id_title">Titre de l'article</label>
+                          </div>
+                      </div>
+
+                      <div class="input">
+                          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <textarea class="mdl-textfield__input" id="id_intro" name="intro" rows="4" cols="50">{{ object.intro }}</textarea>
+                            <label class="mdl-textfield__label" for="id_intro">Introduction de l'article</label>
+                          </div>
+                      </div>
+
+                      <div class="input">
+                          <textarea id="id_content" name="content"></textarea>
+                      </div>
+
+                    <input type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect" value="Modifier l'article"></input>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block fab_create_article %}{% endblock %}
+
+
+{% block script %}
+    <script>
+        $('#id_content').trumbowyg({
+            lang: 'fr',
+            btnsDef: {
+                // Customizables dropdowns
+                formattingLight: {
+                    dropdown: ['h1', 'p', 'blockquote'],
+                    ico: 'formatting' // Apply formatting icon
+                }
+            },
+            btns: [
+                'formattingLight',
+                '|', 'bold', 'italic', 'underline', 'strikethrough',
+                '|', 'link',
+                '|', 'insertImage',
+                '|', 'btnGrp-lists'
+            ],
+            fullscreenable: false,
+            autogrow: true
+        });
+
+        $('#id_content').trumbowyg('html', "{{ object.content | bleach }}");
+
+        $('.trumbowyg-editor').attr('style', 'height: 100%');
+    </script>
+{% endblock %}

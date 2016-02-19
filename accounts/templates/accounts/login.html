@@ -1,0 +1,14 @@
+{% extends "accounts/form_accounts.html" %}
+
+{% block page_title %}
+    Connexion
+{% endblock %}
+
+{% block snackbar %}
+    {% if error %}
+    <div class="snackbar" id="form_state">
+        <span class="snackbar_text"><i class="material-icons">report_problem</i> {{ error }}</span>
+        <span class="snackbar_close">Fermer</span>
+    </div>
+    {% endif %}
+{% endblock %}

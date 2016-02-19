@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+{% load l10n %}
+
+{% block css %}
+    <link rel="stylesheet/less" type="text/css" href="{% static 'css/style-form.less' %}">
+    <link rel="stylesheet/less" type="text/css" href="{% static 'accounts/css/style-accounts.less' %}">
+{% endblock %}
+
+{% block content %}
+
+<div class="mdl-grid">
+    <div class="mdl-cell mdl-cell--10-col">
+        <h2 class="page_title">{% block page_title %}{% endblock %}</h2>
+
+        <div class="mdl-grid">
+            <div class="div_form_accounts">
+                {% include "form.html" %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block snackbar %}
+    {% if form.errors %}
+    <div class="snackbar" id="form_state">
+        <span class="snackbar_text"><i class="material-icons">report_problem</i> {% block error_form_snackbar %}Erreur dans le formulaire{% endblock %}</span>
+        <span class="snackbar_close">Fermer</span>
+    </div>
+    {% endif %}
+{% endblock %}

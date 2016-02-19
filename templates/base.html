@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.1.1/material.red-indigo.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet/less" type="text/css" href="{% static 'css/style.less' %}">
+    {% block css %}{% endblock %}
+    <script src="{% static 'js/material.js' %}" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    {% block js_url %}{% endblock %}
+    <script src="{% static 'js/script.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/less.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/dotdot.js' %}" type="text/javascript"></script>
+    <title>Monty au bûcher</title>
+</head>
+<body>
+
+<div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer
+            mdl-layout--fixed-header">
+  <header class="mdl-layout__header">
+    <div class="mdl-layout__header-row">
+      <div class="mdl-layout-spacer"></div>
+      <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable
+                  mdl-textfield--floating-label mdl-textfield--align-right">
+        <label class="mdl-button mdl-js-button mdl-button--icon"
+               for="fixed-header-drawer-exp">
+          <i class="material-icons">search</i>
+        </label>
+        <div class="mdl-textfield__expandable-holder">
+          <input class="mdl-textfield__input" type="text" name="sample"
+                 id="fixed-header-drawer-exp">
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="mdl-layout__drawer">
+    <nav class="mdl-navigation">
+
+        {% if request.user.is_authenticated %}
+            <div id="connected_user">
+                <p>
+                    <i class="material-icons account_icon" role="presentation">account_circle</i> {{ user.username }}
+                    <!-- Right aligned menu below button -->
+                    <button id="action_profile" class="mdl-button mdl-js-button mdl-button--icon">
+                      <i class="material-icons">settings</i>
+                    </button>
+
+                    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="action_profile">
+                      <li class="mdl-menu__item"><a href="{% url "change_password" %}">Modifier le mot de passe</a></li>
+                      <li disabled class="mdl-menu__item">Ajouter un mail</li>
+                    </ul>
+                </p>
+            </div>
+            <p id="drawer_title">Menu</p>
+            <a class="mdl-navigation__link {% block accueil_active %}{% endblock %}" href="{% url "get_articles" %}">
+                <i class="material-icons" role="presentation">home</i>
+                Accueil
+            </a>
+            <a class="mdl-navigation__link {% block deconnexion_active %}{% endblock %}" href="{% url "logout" %}">
+                <i class="material-icons">cancel</i>
+                Déconnexion
+            </a>
+
+        {% else %}
+            <p id="drawer_title">Menu</p>
+            <a class="mdl-navigation__link {% block accueil_active_2 %}{% endblock %}" href="{% url "get_articles" %}">
+                <i class="material-icons" role="presentation">home</i>
+                Accueil
+            </a>
+            <a class="mdl-navigation__link {% block inscription_active %}{% endblock %}" href="{% url "create_user" %}">
+                <i class="material-icons">person_add</i>
+                Inscription
+            </a>
+            <a class="mdl-navigation__link {% block connexion_active %}{% endblock %}" href="{% url "login" %}">
+                <i class="material-icons">account_circle</i>
+                Connexion
+            </a>
+        {% endif %}
+    </nav>
+  </div>
+
+
+  <main class="mdl-layout__content">
+    <div class="page-content">{% block content %}{% endblock %}</div>
+  </main>
+
+    {% if request.user.is_authenticated %}
+
+        {% block fab_create_article %}
+            <a href="{% url "create_article" %}" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect button_fab_action" id="button_add_article">
+                <i class="material-icons">add</i>
+            </a>
+
+            <div class="mdl-tooltip mdl-tooltip--large mdl-tooltip--left" for="button_add_article">
+                Ajouter un article
+            </div>
+        {% endblock %}
+    {% endif %}
+
+    {% block snackbar %}
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="snackbar" id="form_state">
+                    <span class="snackbar_text"><i class="material-icons">{{ msg.extra_tags }}</i> {{ msg }}</span>
+                    <span class="snackbar_close">Fermer</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endblock %}
+
+</div>
+
+<script>
+    $(function snackbarHide(){
+        var snackbar = $('.snackbar');
+        var leftSnack = $(window).width()*0.5 - snackbar.width()/2;
+        snackbar.css('left', leftSnack + 'px');
+        snackbar.fadeIn().delay(6000).fadeOut();
+        $('.snackbar_close').click(function() {
+            snackbar.stop(true, true).fadeOut();
+        });
+    });
+
+    // supprimer les paragraphes vides
+    $('p').each(function() {
+        var $this = $(this);
+        if($this.html().replace(/\s|&nbsp;/g, '').length == 0)
+            $this.remove();
+    });
+</script>
+{% block script %}{% endblock %}
+
+</body>
+</html>
