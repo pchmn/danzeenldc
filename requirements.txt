@@ -1,4 +1,6 @@
-django_bleach
+django-bleach
 requests
 pip install requests
 pip install schedule
+mysqlclient
+widget-tweaks
