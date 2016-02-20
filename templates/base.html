@@ -87,7 +87,7 @@
     <div class="page-content">{% block content %}{% endblock %}</div>
   </main>
 
-    {% if request.user.is_authenticated %}
+    {% if request.user.is_authenticated and request.user.is_staff %}
 
         {% block fab_create_article %}
             <a href="{% url "create_article" %}" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect button_fab_action" id="button_add_article">
