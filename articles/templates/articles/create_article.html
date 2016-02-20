@@ -1,57 +1,10 @@
-{% extends "base.html" %}
-{% load static %}
+{% extends "articles/form_create_update_article.html" %}
 
-{% block css %}
-    <link rel="stylesheet" href="{% static 'editor/dist/ui/trumbowyg.min.css' %}">
-    <link rel="stylesheet/less" type="text/css" href="{% static 'articles/css/style-articles.less' %}">
-    <link rel="stylesheet/less" type="text/css" href="{% static 'css/style-form.less' %}">
+{% block page_title %}
+    Ajouter un article
 {% endblock %}
 
-{% block js_url %}
-    <script src="{% static 'editor/dist/trumbowyg.min.js' %}"></script>
-{% endblock %}
-
-{% block content %}
-
-<div class="mdl-grid">
-    <div class="mdl-cell mdl-cell--10-col">
-        <h2 class="page_title">Ajouter un article</h2>
-
-        <div class="mdl-grid">
-            <div id="div_form_create_update_article">
-
-                <form action="" method="post">
-                    {% csrf_token %}
-
-                      <div class="input">
-                          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <input class="mdl-textfield__input" id="id_title" maxlength="200" name="title" type="text">
-                            <label class="mdl-textfield__label" for="id_title">Titre de l'article</label>
-                          </div>
-                      </div>
-
-                      <div class="input">
-                          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <textarea class="mdl-textfield__input" id="id_intro" name="intro" rows="4" cols="50"></textarea>
-                            <label class="mdl-textfield__label" for="id_intro">Introduction de l'article</label>
-                          </div>
-                      </div>
-
-                      <div class="input">
-                          <textarea id="id_content" name="content"></textarea>
-                      </div>
-
-                    <input type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect" value="Ajouter l'article"></input>
-                </form>
-
-            </div>
-        </div>
-    </div>
-</div>
-
-{% endblock %}
-
-{% block fab_create_article %}{% endblock %}
+{% block form_input %}Ajouter l'article{% endblock %}
 
 
 {% block script %}

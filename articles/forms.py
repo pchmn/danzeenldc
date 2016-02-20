@@ -4,6 +4,10 @@ from django.contrib.auth.models import User
 
 
 class CreateArticleForm(forms.ModelForm):
+    title = forms.CharField(error_messages={'required': "Votre titre est vide"})
+    intro = forms.CharField(error_messages={'required': "Votre intro est vide"})
+    content = forms.CharField(error_messages={'required': "Votre article est vide"})
+
     class Meta:
         model = Article
         fields = ["title", "intro", "content"]

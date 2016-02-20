@@ -38,7 +38,7 @@ a {
   background: #2C2C2C;
   border-right: 3px solid rgb(35, 35, 35);
 
-  @media screen and (min-width: 1024px) {
+  @media screen and (min-width: 1025px) {
     padding-top: 90px;
     z-index: inherit;
   }
@@ -55,6 +55,10 @@ a {
       text-transform: uppercase;
       font-size: 12px;
       font-weight: 600;
+
+      @media screen and (max-width: 1024px) {
+        margin-top: 20px;
+      }
     }
 
     .mdl-navigation__link {
@@ -158,6 +162,11 @@ a {
 
   &:hover {
     background: #f44336;
+  }
+
+  @media screen and (max-width: 600px) {
+    bottom: 25px;
+    right: 25px;
   }
 }
 

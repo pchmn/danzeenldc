@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'editor/dist/ui/trumbowyg.min.css' %}">
+    <link rel="stylesheet/less" type="text/css" href="{% static 'articles/css/style-articles.less' %}">
+    <link rel="stylesheet/less" type="text/css" href="{% static 'css/style-form.less' %}">
+{% endblock %}
+
+{% block js_url %}
+    <script src="{% static 'editor/dist/trumbowyg.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<div class="mdl-grid">
+    <div class="mdl-cell mdl-cell--10-col">
+        <h2 class="page_title">{% block page_title %}{% endblock %}</h2>
+
+        <div class="mdl-grid">
+            <div id="div_form_create_update_article">
+
+                <form action="" method="post">
+                    {% csrf_token %}
+
+                      {% if form.title.errors %}
+                          {% for error in form.title.errors %}
+                              <p class="form_errors"><i class="material-icons">report_problem</i> {{ error }}</p>
+                          {% endfor %}
+                      {% endif %}
+
+                      <div class="input">
+                          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input class="mdl-textfield__input" id="id_title" maxlength="200" name="title" type="text" value="{% block value_title %}{% endblock %}">
+                            <label class="mdl-textfield__label" for="id_title">Titre de l'article</label>
+                          </div>
+                      </div>
+
+                      {% if form.intro.errors %}
+                          {% for error in form.intro.errors %}
+                              <p class="form_errors"><i class="material-icons">report_problem</i> {{ error }}</p>
+                          {% endfor %}
+                      {% endif %}
+
+                      <div class="input">
+                          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <textarea class="mdl-textfield__input" id="id_intro" name="intro" rows="4" cols="50">{% block value_intro %}{% endblock %}</textarea>
+                            <label class="mdl-textfield__label" for="id_intro">Introduction de l'article</label>
+                          </div>
+                      </div>
+
+                      {% if form.content.errors %}
+                          {% for error in form.content.errors %}
+                              <p class="form_errors"><i class="material-icons">report_problem</i> {{ error }}</p>
+                          {% endfor %}
+                      {% endif %}
+
+                      <div class="input">
+                          <textarea id="id_content" name="content"></textarea>
+                      </div>
+
+                    <input type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect" value="{% block form_input %}{% endblock %}">
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block snackbar %}
+    {% if form.errors %}
+    <div class="snackbar" id="form_state">
+        <span class="snackbar_text"><i class="material-icons">report_problem</i> {% block error_form_snackbar %}Erreur dans le formulaire{% endblock %}</span>
+        <span class="snackbar_close">Fermer</span>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block fab_create_article %}{% endblock %}

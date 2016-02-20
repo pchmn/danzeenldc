@@ -54,6 +54,50 @@ def create_article(request):
     return render(request, "articles/create_article.html", locals())
 
 
+class UpdateArticle(UpdateView):
+    """
+    Modification d'un article
+
+    L'utilisateur qui veut modifier l'article doit en être l'auteur
+    """
+    model = Article
+    fields = ['title', 'intro', 'content']
+    template_name = "articles/update_article.html"
+
+    # on vérifie que l'user connecté est bien l'auteur de l'article
+    def dispatch(self, request, *args, **kwargs):
+        if self.request.user != self.get_object().author:
+            raise PermissionDenied()
+        return super(UpdateArticle, self).dispatch(request, *args, **kwargs)
+
+    # récupération du bon article selon le slug
+    def get_object(self):
+        return Article.objects.get(slug=self.kwargs['slug'])
+
+    # on redirige vers l'article modifié en cas de succès
+    def get_success_url(self):
+        messages.success(self.request, 'Article modifié !', extra_tags='done')
+        return reverse_lazy("get_article", kwargs={'slug': self.object.slug})
+
+
+def delete_article(request, id):
+    """
+    Suppression d'un article selon un id
+    """
+    article = get_object_or_404(Article, pk=id)
+    user = request.user
+
+    # on vérifie que l'utilisateur a les bons droits
+    # et qu'il est l'auteur de l'article
+    if not user.is_staff or user != article.author:
+        raise PermissionDenied()
+
+    # suppression de l'article
+    article.delete()
+
+    return redirect("get_articles")
+
+
 # class GetArticlesList(ListView):
 #     """
 #     Récupération des articles par page
@@ -225,49 +269,6 @@ def create_comment_form(request, article):
     result['form'] = form
 
     return result
-
-
-class UpdateArticle(UpdateView):
-    """
-    Modification d'un article
-
-    L'utilisateur qui veut modifier l'article doit en être l'auteur
-    """
-    model = Article
-    fields = ['title', 'intro', 'content']
-    template_name = "articles/update_article.html"
-
-    # on vérifie que l'user connecté est bien l'auteur de l'article
-    def dispatch(self, request, *args, **kwargs):
-        if self.request.user != self.get_object().author:
-            raise PermissionDenied()
-        return super(UpdateArticle, self).dispatch(request, *args, **kwargs)
-
-    # récupération du bon article selon le slug
-    def get_object(self):
-        return Article.objects.get(slug=self.kwargs['slug'])
-
-    # on redirige vers l'article modifié en cas de succès
-    def get_success_url(self):
-        return reverse_lazy("get_article", kwargs={'slug': self.object.slug})
-
-
-def delete_article(request, id):
-    """
-    Suppression d'un article selon un id
-    """
-    article = get_object_or_404(Article, pk=id)
-    user = request.user
-
-    # on vérifie que l'utilisateur a les bons droits
-    # et qu'il est l'auteur de l'article
-    if not user.is_staff or user != article.author:
-        raise PermissionDenied()
-
-    # suppression de l'article
-    article.delete()
-
-    return redirect("get_articles")
 
 
 def vote_article(request, id_article, opinion):
