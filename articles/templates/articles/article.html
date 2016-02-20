@@ -120,7 +120,7 @@
 </div>
 
     {# bouton modification article #}
-    {% if request.user.is_authenticated and request.user == article.author %}
+    {% if perms.articles.change_article and request.user == article.author %}
 
         {% block fab_create_article %}
         {% endblock %}

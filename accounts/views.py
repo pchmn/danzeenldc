@@ -21,6 +21,13 @@ class CreateUser(CreateView):
     form_class = CreateUserForm
     template_name = 'accounts/create_user.html'
 
+    # on vérifie que l'user connecté n'est pas connecté
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
+            messages.warning(request, 'Petit malin...', extra_tags='sentiment_satisfied')
+            return redirect("get_articles")
+        return super(CreateUser, self).dispatch(request, *args, **kwargs)
+
     # on redirige vers l'article modifié en cas de succès
     def get_success_url(self):
         messages.success(self.request, 'Inscription validée !', extra_tags='done')
@@ -33,6 +40,10 @@ def login_user(request):
     Vérifie que la combinaison pseudo/mot de passe est bonne
     Et que le compte est actif
     """
+    if request.user.is_authenticated():
+        messages.warning(request, 'Petit malin...', extra_tags='sentiment_satisfied')
+        return redirect("get_articles")
+
     next = request.GET.get('next', "")
 
     if request.method == 'POST':

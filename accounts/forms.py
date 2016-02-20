@@ -21,7 +21,7 @@ class CreateUserForm(UserCreationForm):
         fields = ["username", "email"]
         labels = {
             'username': 'Nom d\'utilisateur',
-            'email': 'Adresse email',
+            'email': 'Email (pas obligatoire)',
         }
         error_messages = {
             'username': {

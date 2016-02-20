@@ -1,3 +1,4 @@
+django-flat-theme
 django-bleach
 requests
 pip install requests

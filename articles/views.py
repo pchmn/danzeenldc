@@ -6,7 +6,7 @@ import datetime
 import collections
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse_lazy
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
@@ -20,7 +20,7 @@ from articles.models import Article, Commentaire
 from articles.forms import CreateArticleForm, CreateCommentForm
 
 
-@login_required()
+@user_passes_test(lambda u: u.has_perm('articles.add_article'))
 def create_article(request):
     """
     Création d'un article
@@ -28,10 +28,6 @@ def create_article(request):
     Il faut être connecté et avoir les bons droits
     """
     user = request.user
-
-    # vérification des bons droits
-    if not user.is_staff:
-        raise PermissionDenied()
 
     if request.method == 'POST':
         form = CreateArticleForm(request.POST)
@@ -66,7 +62,7 @@ class UpdateArticle(UpdateView):
 
     # on vérifie que l'user connecté est bien l'auteur de l'article
     def dispatch(self, request, *args, **kwargs):
-        if self.request.user != self.get_object().author:
+        if request.user != self.get_object().author:
             raise PermissionDenied()
         return super(UpdateArticle, self).dispatch(request, *args, **kwargs)
 
