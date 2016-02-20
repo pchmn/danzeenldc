@@ -178,7 +178,9 @@
                    </span>
 
                    {% if comments.has_next %}
-                       <a href="javascript:void(0);" class="comments_page mdl-button mdl-js-button mdl-button--icon"  id="{{ comments.next_page_number }}"><i class="material-icons">arrow_forward</i></a>
+                       <a href="javascript:void(0);" class="comments_page mdl-button mdl-js-button mdl-button--icon"  id="{{ comments.next_page_number }}">
+                           <i class="material-icons">arrow_forward</i>
+                       </a>
                    {% else %}
                        <a href="javascript:void(0);" class="mdl-button mdl-js-button mdl-button--icon disabled">
                            <i class="material-icons">arrow_forward</i>

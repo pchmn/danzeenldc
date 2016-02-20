@@ -84,13 +84,10 @@
 
                             {% endfor %}
 
-                        </div>
-                    </div>
-
                     {# pagination #}
                     <div id="articles_list_pagination">
                         {% if articles.has_previous %}
-                            <a href="javascript:void(0);" class="comments_page mdl-button mdl-js-button mdl-button--icon" id="{{ articles.previous_page_number }}">
+                            <a href="javascript:void(0);" class="articles_page mdl-button mdl-js-button mdl-button--icon" id="{{ articles.previous_page_number }}">
                                 <i class="material-icons">arrow_backward</i>
                             </a>
 
@@ -104,13 +101,18 @@
                             <b>{{ articles.number }}</b> / {{ articles.paginator.num_pages }}
                         </span>
                         {% if articles.has_next %}
-                            <a href="javascript:void(0);" class="comments_page mdl-button mdl-js-button mdl-button--icon"  id="{{ articles.next_page_number }}"><i class="material-icons">arrow_forward</i></a>
+                            <a href="javascript:void(0);" class="articles_page mdl-button mdl-js-button mdl-button--icon"  id="{{ articles.next_page_number }}">
+                                <i class="material-icons">arrow_forward</i>
+                            </a>
 
                         {% else %}
-                            <a href="javascript:void(0);" class="mdl-button mdl-js-button mdl-button--icon disabled">
+                            <a href="javascript:void(0);" class="articles_page mdl-button mdl-js-button mdl-button--icon disabled">
                                 <i class="material-icons">arrow_forward</i>
                             </a>
                         {% endif %}
+                    </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
@@ -236,6 +238,14 @@
                 }
                 console.log("2nd", wrapTable.height())
             });
+        });
+
+        // pagination
+        $('#articles_list1').on('click', '.articles_page', function() {
+            var page = $(this).attr("id");
+
+            $("#div_articles_parent").load("{% url "get_articles" %}" + page + " #div_articles_content")
+
         });
     </script>
 
