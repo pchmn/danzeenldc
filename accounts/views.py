@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
@@ -19,7 +20,11 @@ class CreateUser(CreateView):
     model = User
     form_class = CreateUserForm
     template_name = 'accounts/create_user.html'
-    success_url = 'create_user'
+
+    # on redirige vers l'article modifié en cas de succès
+    def get_success_url(self):
+        messages.success(self.request, 'Inscription validée !', extra_tags='done')
+        return reverse_lazy("login")
 
 
 def login_user(request):

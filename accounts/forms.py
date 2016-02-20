@@ -37,8 +37,9 @@ class CreateUserForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        if User.objects.filter(email=email).exists():
-            raise forms.ValidationError("Cet email est déjà utilisé")
+        if email != "":
+            if User.objects.filter(email=email).exists():
+                raise forms.ValidationError("Cet email est déjà utilisé")
         return email
 
     def save(self, commit=True):

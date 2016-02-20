@@ -1,5 +1,7 @@
 {% extends "accounts/form_accounts.html" %}
 
+{% block connexion_active %}active{% endblock %}
+
 {% block page_title %}
     Connexion
 {% endblock %}
@@ -10,5 +12,14 @@
         <span class="snackbar_text"><i class="material-icons">report_problem</i> {{ error }}</span>
         <span class="snackbar_close">Fermer</span>
     </div>
+    {% endif %}
+
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="snackbar" id="form_state">
+                <span class="snackbar_text"><i class="material-icons">{{ msg.extra_tags }}</i> {{ msg }}</span>
+                <span class="snackbar_close">Fermer</span>
+            </div>
+        {% endfor %}
     {% endif %}
 {% endblock %}
