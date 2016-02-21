@@ -281,6 +281,12 @@
 
         .mdl-textfield {
           margin-bottom: -15px;
+
+          &.mdl-textfield-block {
+            @media screen and (min-width: 1610px) {
+              display: block;
+            }
+          }
         }
 
         textarea {
@@ -338,7 +344,7 @@
       }
 
       // --- media queries ---
-      @media screen and (max-width: 1241px) {
+      @media screen and (max-width: 1275px) {
 
         padding-bottom: 0;
 
