@@ -271,7 +271,7 @@ def create_comment_form(request, article):
     return result
 
 
-def vote_article(request, id_article, opinion):
+def vote_article(request, id_article):
     """
     Voter pour un article
 
@@ -284,6 +284,8 @@ def vote_article(request, id_article, opinion):
     already_voted = False
     cookie_votes_article = {}
     id_article_texte = str(id_article)
+
+    opinion = request.GET.get('opinion', '')
 
     # test de la présence du cookie
     if 'cookie_votes_article' in request.session:
@@ -334,7 +336,7 @@ def vote_article(request, id_article, opinion):
     })
 
 
-def vote_comment(request, id_comment, opinion):
+def vote_comment(request, id_comment):
     """
     Voter pour un commentaire
 
@@ -348,6 +350,8 @@ def vote_comment(request, id_comment, opinion):
     already_voted = False
     cookie_votes_comment = {}
     id_comment_texte = str(id_comment)
+
+    opinion = request.GET.get('opinion', '')
 
     # test de la présence du cookie
     if 'cookie_votes_comment' in request.session:

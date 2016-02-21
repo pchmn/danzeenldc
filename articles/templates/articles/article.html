@@ -214,21 +214,6 @@
 
 {% endblock %}
 
-{% comment %}{% block snackbar %}
-    {% if form_success %}
-    <div class="snackbar" id="form_state">
-        <span class="snackbar_text"><i class="material-icons">done</i> {{ snackbar_message }}</span>
-        <span class="snackbar_close">Fermer</span>
-    </div>
-    {% endif %}
-
-    {% if form.errors %}
-    <div class="snackbar" id="form_state">
-        <span class="snackbar_text"><i class="material-icons">report_problem</i> {{ snackbar_message }}</span>
-        <span class="snackbar_close">Fermer</span>
-    </div>
-    {% endif %}
-{% endblock %}{% endcomment %}
 
 {# --------- #}
 {# Script JS #}
@@ -238,7 +223,7 @@
     // ajax - vote_article
     $("#div_buttons_vote").on('click', "a.vote_article", function() {
         $.ajax({
-            url: 'http://127.0.0.1:8000/articles/vote_article/{{ article.id }}/' + $(this).attr("id"),
+            url: "{% url "vote_article" article.id %}?opinion=" + $(this).attr("id"),
             type: 'get',
             dataType: "json",
             success: function(data) {
@@ -255,9 +240,11 @@
     $("#article_comments_suggest").on('click', "a.vote_comment", function() {
         var id_commentaire = $(this).attr("data-id-comment");
         var like = $(this).attr("id");
+        // mettre bon id commentaire dans l'url
+        var url = "{% url "vote_comment" 999 %}".replace("999", id_commentaire);
 
         $.ajax({
-            url: 'http://127.0.0.1:8000/articles/vote_comment/' + id_commentaire + '/' + like,
+            url: url + "?opinion=" + like,
             type: 'get',
             dataType: "json",
             success: function(data) {
