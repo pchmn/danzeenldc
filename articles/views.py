@@ -1,6 +1,6 @@
 import json
 import os
-import datetime
+from datetime import datetime, timedelta
 import collections
 
 from django.shortcuts import render, redirect
@@ -145,9 +145,9 @@ def get_articles(request, page=1):
     last_next_match = json.load(open(f2))
 
     last_result = last_next_match['last_result']
-    last_result['date'] = datetime.datetime.strptime(last_result['date'], "%Y-%m-%dT%H:%M:%SZ")
+    last_result['date'] = datetime.strptime(last_result['date'], "%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=1)
     next_match = last_next_match['next_match']
-    next_match['date'] = datetime.datetime.strptime(next_match['date'], "%Y-%m-%dT%H:%M:%SZ")
+    next_match['date'] = datetime.strptime(next_match['date'], "%Y-%m-%dT%H:%M:%SZ") + timedelta(hours=1)
 
     return render(request, "articles/articles_list.html", locals())
 
