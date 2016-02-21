@@ -1,6 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
+from accounts.models import UserProfile
+
+
+class UserProfileInline(admin.StackedInline):
+    model = UserProfile
 
 
 class UserAdminCustom(UserAdmin):
@@ -12,6 +17,7 @@ class UserAdminCustom(UserAdmin):
         ('Dates importantes', {'fields': ('last_login', 'date_joined')}),
     )
     search_fields = ('username', 'email')
+    inlines = (UserProfileInline,)
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdminCustom)

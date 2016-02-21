@@ -1,17 +1,7 @@
 from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.contrib.auth.models import User
-from articles.utils import unique_slugify, JSONField
-
-
-class UserProfile(models.Model):
-    """
-    Classe qui représente des informations supplémentaires
-    pour un utilisateur
-    """
-    user = models.OneToOneField(User)
-    votes_articles = JSONField()
-    votes_comments = JSONField()
+from articles.utils import unique_slugify
 
 
 class Article(models.Model):

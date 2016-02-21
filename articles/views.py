@@ -167,6 +167,7 @@ def get_article(request, slug):
     # derniers articles pour les afficher
     last_articles = Article.objects.all().exclude(slug=article.slug).order_by('-date')[:5]
     # variables utiles pour le vote
+    votes_article = {}
     already_voted = False
     id_article_texte = str(article.id)
     form_success = False
@@ -186,11 +187,16 @@ def get_article(request, slug):
 
     # on test si l'utilisateur a déjà voté pour l'article
     # afin de masqué un des boutons de vote si c'est le cas
-    if 'cookie_votes_article' in request.session:
-        cookie_votes_article = request.session['cookie_votes_article']
-        if id_article_texte in cookie_votes_article:
-            opinion = cookie_votes_article[id_article_texte]
-            already_voted = True
+    user = request.user
+    if user.is_authenticated():
+        votes_article = user.profile.votes_articles
+    else:
+        if 'cookie_votes_article' in request.session:
+            votes_article = request.session['cookie_votes_article']
+
+    if id_article_texte in votes_article:
+        opinion = votes_article[id_article_texte]
+        already_voted = True
 
     # vérifie si l'utilisateur a déjà vu l'article
     # fonction annexe
@@ -216,22 +222,34 @@ def set_cookie_view_article(request, article):
     le cookie pour les vues d'un article
     """
     views_article = []
+    user = request.user
 
-    # on test si l'utilisateur avait déjà vu cet article
-    if 'cookie_views_article' in request.session:
-        views_article = request.session['cookie_views_article']
-        # si l'utilisateur n'avait pas vu cet article
-        if article.id not in views_article:
+    # si l'utilisateur est connecté, on regarde s'il a deja vu l'article
+    if user.is_authenticated():
+        views_article = user.profile.views_articles
+        if str(article.id) not in views_article:
+            article.views += 1
+            article.save()
+            views_article[article.id] = ""
+            user.profile.views_articles = views_article
+            user.profile.save()
+
+    else:
+        # on test si l'utilisateur avait déjà vu cet article
+        if 'cookie_views_article' in request.session:
+            views_article = request.session['cookie_views_article']
+            # si l'utilisateur n'avait pas vu cet article
+            if article.id not in views_article:
+                article.views += 1
+                article.save()
+                views_article.append(article.id)
+        else:
             article.views += 1
             article.save()
             views_article.append(article.id)
-    else:
-        article.views += 1
-        article.save()
-        views_article.append(article.id)
 
-    # on met à jour le cookie
-    request.session['cookie_views_article'] = views_article
+        # on met à jour le cookie
+        request.session['cookie_views_article'] = views_article
 
 
 def create_comment_form(request, article):
@@ -282,23 +300,32 @@ def vote_article(request, id_article):
     """
     article = get_object_or_404(Article, pk=id_article)
     already_voted = False
-    cookie_votes_article = {}
+    votes_article = {}
     id_article_texte = str(id_article)
+    user = request.user
 
     opinion = request.GET.get('opinion', '')
 
-    # test de la présence du cookie
-    if 'cookie_votes_article' in request.session:
-        cookie_votes_article = request.session['cookie_votes_article']
+    # si l'utilisateur est connecté
+    if user.is_authenticated():
+        votes_article = user.profile.votes_articles
+
+    else:
+        # test de la présence du cookie
+        if 'cookie_votes_article' in request.session:
+            votes_article = request.session['cookie_votes_article']
+
+    # on vérifie si l'utilisateur a déjà voté pour cet article
+    if id_article_texte in votes_article:
+        already_voted = True
         # on vérifie que l'utilisateur n'avait pas déjà effectué ce vote
-        if id_article_texte in cookie_votes_article and opinion == cookie_votes_article[id_article_texte]:
+        if opinion == votes_article[id_article_texte]:
             return JsonResponse({
                 'article': article.title,
                 'vote': 'déjà voté',
                 'likes': article.likes,
                 'dislikes': article.dislikes
             })
-        already_voted = True
 
     # ajout du vote
     if opinion == "like_article":
@@ -324,9 +351,13 @@ def vote_article(request, id_article):
 
     article.save()
     # ajout du vote dans le dictionnaire du cookie
-    cookie_votes_article[id_article_texte] = opinion
+    votes_article[id_article_texte] = opinion
     # on met à jour le cookie
-    request.session['cookie_votes_article'] = cookie_votes_article
+    if user.is_authenticated():
+        user.profile.votes_articles = votes_article
+        user.profile.save()
+    else:
+        request.session['cookie_votes_article'] = votes_article
 
     return JsonResponse({
         'article': article.title,
@@ -348,16 +379,25 @@ def vote_comment(request, id_comment):
     commentaire = get_object_or_404(Commentaire, pk=id_comment)
     article = get_object_or_404(Article, pk=commentaire.article.id)
     already_voted = False
-    cookie_votes_comment = {}
+    votes_comment = {}
     id_comment_texte = str(id_comment)
+    user = request.user
 
     opinion = request.GET.get('opinion', '')
 
+    # si l'utilisateur est connecté
+    if user.is_authenticated():
+        votes_comment = user.profile.votes_comments
+
     # test de la présence du cookie
     if 'cookie_votes_comment' in request.session:
-        cookie_votes_comment = request.session['cookie_votes_comment']
+        votes_comment = request.session['cookie_votes_comment']
+
+    # on vérifie si l'utilisateur a deja voté pour cet article
+    if id_comment_texte in votes_comment:
+        already_voted = True
         # on vérifie que l'utilisateur n'avait pas déjà effectué ce vote
-        if id_comment_texte in cookie_votes_comment and opinion == cookie_votes_comment[id_comment_texte]:
+        if opinion == votes_comment[id_comment_texte]:
             return JsonResponse({
                 'comment': commentaire.id,
                 'vote': 'déjà voté',
@@ -365,7 +405,6 @@ def vote_comment(request, id_comment):
                 'dislikes': commentaire.dislikes,
                 'score': commentaire.score
             })
-        already_voted = True
 
     # ajout du vote
     if opinion == "like_comment":
@@ -381,9 +420,13 @@ def vote_comment(request, id_comment):
 
     commentaire.save()
     # ajout du vote dans le dictionnaire du cookie
-    cookie_votes_comment[id_comment_texte] = opinion
+    votes_comment[id_comment_texte] = opinion
     # on met le cookie
-    request.session['cookie_votes_comment'] = cookie_votes_comment
+    if user.is_authenticated():
+        user.profile.votes_comments = votes_comment
+        user.profile.save()
+    else:
+        request.session['cookie_votes_comment'] = votes_comment
 
     return JsonResponse({
         'comment': commentaire.id,
