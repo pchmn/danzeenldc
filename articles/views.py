@@ -68,7 +68,9 @@ class UpdateArticle(UpdateView):
 
     # récupération du bon article selon le slug
     def get_object(self):
-        return Article.objects.get(slug=self.kwargs['slug'])
+        article = Article.objects.get(slug=self.kwargs['slug'])
+        article.content = article.content.replace('"', '\\"')
+        return article
 
     # on redirige vers l'article modifié en cas de succès
     def get_success_url(self):

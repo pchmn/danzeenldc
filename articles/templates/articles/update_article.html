@@ -2,7 +2,8 @@
 {% load bleach_tags %}
 
 {% block page_title %}
-    Modifier un article
+    {{ object.content | bleach }}
+    {{ object.content }}
 {% endblock %}
 
 {% block form_input %}Modifier l'article{% endblock %}
@@ -34,7 +35,9 @@
             autogrow: true
         });
 
-        $('#id_content').trumbowyg('html', "{{ object.content | bleach }}");
+        var content = "{{ object.content | bleach }}";
+
+        $('#id_content').trumbowyg('html', content.replace(/"/g, ''));
 
         $('.trumbowyg-editor').attr('style', 'height: 100%');
     </script>
