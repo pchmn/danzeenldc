@@ -1,10 +1,7 @@
 {% extends "articles/form_create_update_article.html" %}
 {% load bleach_tags %}
 
-{% block page_title %}
-    {{ object.content | bleach }}
-    {{ object.content }}
-{% endblock %}
+{% block page_title %}Modifier un article{% endblock %}
 
 {% block form_input %}Modifier l'article{% endblock %}
 
