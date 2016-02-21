@@ -1,3 +1,4 @@
+from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.contrib.auth.models import User
 from articles.utils import unique_slugify, JSONField
@@ -49,7 +50,7 @@ class Commentaire(models.Model):
     Classe qui représente les commentaires d'un article
     Chaque commentaire est lié à un article et à un utilisateur
     """
-    content = models.TextField(verbose_name="Contenu")
+    content = models.TextField(verbose_name="Contenu", validators=[MaxLengthValidator(500)])
     author = models.CharField(max_length=50, verbose_name="Auteur")
     likes = models.IntegerField(default=0, verbose_name="Nombre de likes")
     dislikes = models.IntegerField(default=0, verbose_name="Nombre de dislikes")

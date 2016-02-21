@@ -1,8 +1,10 @@
+import bleach
 from django.utils.text import slugify
 import re
 from django.db import models
 from django.core.serializers.json import DjangoJSONEncoder
 import json
+
 
 def unique_slugify(instance, value, slug_field_name='slug', queryset=None,
                    slug_separator='-'):
@@ -105,3 +107,22 @@ class JSONField(models.TextField):
             value = json.dumps(value, cls=DjangoJSONEncoder)
 
         return super(JSONField, self).get_db_prep_save(value)
+
+
+def bleach_html(html_str):
+    """
+    a wrapper for bleach.clean() that strips ALL tags from the input
+    """
+    tags = ['h1', 'h2', 'h3', 'h4', 'p', 'br', 'ul', 'ol', 'li', 'b', 'i', 'u', 'em', 'strong', 'a', 'img', 'strike', 'span']
+    attr = {
+        'a': ['href', 'rel'],
+        'img': ['alt', 'src'],
+    }
+    styles = []
+    strip = True
+
+    return bleach.clean(html_str,
+                        tags=tags,
+                        attributes=attr,
+                        styles=styles,
+                        strip=strip)

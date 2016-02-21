@@ -49,7 +49,7 @@
             </div>
         </div>
 
-        <div id="article_intro">{{ article.intro }}</div>
+        <div id="article_intro">{{ article.intro|safe }}</div>
 
         <div id="article_content">{{ article.content|bleach }}</div>
 
@@ -108,12 +108,14 @@
                         </a>
                 {% endif %}
 
+                        {% comment %}
                         <a href="javascript:void(0);" id="share_article" class="vote_article">
                             <p>
                                 <i class="material-icons">share</i>
                                 <span>Partager</span>
                             </p>
                         </a>
+                        {% endcomment %}
 
         </div>
     </div>

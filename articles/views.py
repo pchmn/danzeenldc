@@ -1,9 +1,8 @@
 import json
 import os
-
 import datetime
-
 import collections
+
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse_lazy
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -18,6 +17,7 @@ from django.contrib import messages
 
 from articles.models import Article, Commentaire
 from articles.forms import CreateArticleForm, CreateCommentForm
+from articles.utils import bleach_html
 
 
 @user_passes_test(lambda u: u.has_perm('articles.add_article'))
@@ -69,7 +69,9 @@ class UpdateArticle(UpdateView):
     # récupération du bon article selon le slug
     def get_object(self):
         article = Article.objects.get(slug=self.kwargs['slug'])
+        article.content = bleach_html(article.content)
         article.content = article.content.replace('"', '\\"')
+        print(article.content)
         return article
 
     # on redirige vers l'article modifié en cas de succès

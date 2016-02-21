@@ -1,3 +1,4 @@
+bleach
 django-flat-theme
 django-bleach
 requests
