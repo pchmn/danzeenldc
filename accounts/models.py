@@ -12,7 +12,7 @@ class UserProfile(models.Model):
     pour un utilisateur
     """
     user = models.OneToOneField(User, related_name="profile")
-    views_articles = JSONField(verbose_name="Articles vues", default={}, blank=True)
+    views_articles = JSONField(verbose_name="Articles vues", default=[], blank=True)
     votes_articles = JSONField(verbose_name="Articles votés", default={}, blank=True)
     votes_comments = JSONField(verbose_name="Commentaires votés", default={}, blank=True)
 

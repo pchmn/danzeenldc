@@ -3,9 +3,8 @@ from django.core.urlresolvers import reverse_lazy
 from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.contrib.auth.models import User
-from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.edit import CreateView
 from accounts.forms import CreateUserForm, LoginForm, UpdatePasswordForm
-from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.decorators import login_required

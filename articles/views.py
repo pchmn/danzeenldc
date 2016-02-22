@@ -59,7 +59,7 @@ class UpdateArticle(UpdateView):
 
     # on vérifie que l'user connecté est bien l'auteur de l'article
     def dispatch(self, request, *args, **kwargs):
-        if request.user != self.get_object().author:
+        if request.user != self.get_object().author and not request.user.is_staff:
             raise PermissionDenied()
         return super(UpdateArticle, self).dispatch(request, *args, **kwargs)
 
@@ -224,10 +224,10 @@ def set_cookie_view_article(request, article):
     # si l'utilisateur est connecté, on regarde s'il a deja vu l'article
     if user.is_authenticated():
         views_article = user.profile.views_articles
-        if str(article.id) not in views_article:
+        if article.id not in views_article:
             article.views += 1
             article.save()
-            views_article[article.id] = ""
+            views_article.append(article.id)
             user.profile.views_articles = views_article
             user.profile.save()
 

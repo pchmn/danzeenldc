@@ -127,7 +127,7 @@
 </div>
 
     {# bouton modification article #}
-    {% if perms.articles.change_article and request.user == article.author %}
+    {% if perms.articles.change_article and request.user == article.author or request.user.is_staff %}
 
         {% block fab_create_article %}
         {% endblock %}
