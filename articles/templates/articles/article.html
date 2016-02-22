@@ -18,6 +18,7 @@
 {# ------- #}
 <div class="mdl-grid" id="article_detail" >
     <div class="mdl-cell mdl-cell--10-col">
+        {# partie du haut #}
         <div class="mdl-grid">
             <div class="mdl-cell mdl-cell--9-col">
                 <p id="article_date">{{ article.date | date:"j F Y" }}</p>
@@ -25,6 +26,7 @@
                 <p id="article_author"><i>Écrit par</i> <a href=""><b>{{ article.author.username }}</b></a></p>
             </div>
 
+            {#  article likes #}
             <div class="mdl-cell mdl-cell--3-col mdl-cell--12-col-tablet mdl-cell--12-col-phone" id="article_likes_parent">
                 <div id="article_likes">
                     <p id="nb_vues">
@@ -47,8 +49,11 @@
                     </div>
                 </div>
             </div>
+            {# fin article likes #}
         </div>
+        {# fin partie du haut #}
 
+        {# parti du bas #}
         <div id="article_intro">{{ article.intro|safe }}</div>
 
         <div id="article_content">{{ article.content|bleach }}</div>
@@ -148,51 +153,7 @@
         </div>
 
         <div id="article_comments_body">
-            <div id="article_comments_body_content">
-            {% if comments %}
-                {% for comment in comments %}
-                    <div id="parent_comment_{{ comment.id }}">
-                        <div id="comment_{{ comment.id }}">
-                            <p class="comment_author">{{ comment.author }} <span class="comment_date"><em>{{ comment.date | date:"d b, H:i" }}</em></span></p>
-                            <p class="comment_content">{{ comment.content }}</p>
-                            {% if comment.score > 0 %}
-                                <span class="comment_score">{{ comment.score }}</span>
-                            {% endif %}
-                            <a href="javascript:void(0);" id="like_comment" class="vote_comment" data-id-comment="{{ comment.id }}"><i class="material-icons">keyboard_arrow_up</i></a>
-                            <a href="javascript:void(0);" id="dislike_comment" class="vote_comment" data-id-comment="{{ comment.id }}"><i class="material-icons">keyboard_arrow_down</i></a>
-                        </div>
-                    </div>
-                {% endfor %}
-
-                <div id="article_comments_pagination">
-                   {% if comments.has_previous %}
-                       <a href="javascript:void(0);" class="comments_page mdl-button mdl-js-button mdl-button--icon" id="{{ comments.previous_page_number }}">
-                           <i class="material-icons">arrow_backward</i>
-                       </a>
-                   {% else %}
-                       <a href="javascript:void(0);" class="mdl-button mdl-js-button mdl-button--icon disabled">
-                           <i class="material-icons">arrow_backward</i>
-                       </a>
-                   {% endif %}
-
-                   <span class="current">
-                       <b>{{ comments.number }}</b> / {{ comments.paginator.num_pages }}
-                   </span>
-
-                   {% if comments.has_next %}
-                       <a href="javascript:void(0);" class="comments_page mdl-button mdl-js-button mdl-button--icon"  id="{{ comments.next_page_number }}">
-                           <i class="material-icons">arrow_forward</i>
-                       </a>
-                   {% else %}
-                       <a href="javascript:void(0);" class="mdl-button mdl-js-button mdl-button--icon disabled">
-                           <i class="material-icons">arrow_forward</i>
-                       </a>
-                   {% endif %}
-                </div>
-            {% else %}
-                <p style="margin-bottom: 0;">Postez le premier commentaire !</p>
-            {% endif %}
-            </div>
+            {% include "articles/article_comments.html" %}
         </div>
 
     </div>
@@ -231,7 +192,7 @@
                 $("#article_likes_parent").load("{% url "get_article" article.slug %} #article_likes");
             },
             failure: function(data) {
-                alert('Erreur');
+                console.log('Erreur', data);
             }
         })
     });
@@ -252,7 +213,7 @@
                 $("#parent_comment_" + id_commentaire ).load("{% url "get_article" article.slug %}?page_comments=" + page + " #comment_" + id_commentaire)
             },
             failure: function(data) {
-                alert('Erreur');
+                console.log('Erreur', data);
             }
         })
     });
